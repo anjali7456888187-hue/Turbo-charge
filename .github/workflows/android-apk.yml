@@ -54,35 +54,12 @@ jobs:
         with:
           name: turbo-charge-debug-apk
           path: apk
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Run APK on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
         with:
-          packages: 'platform-tools platforms;android-35 emulator system-images;android-35;default;x86_64'
-      - name: Create and boot Android emulator
-        run: |
-          set -eu
-          EMULATOR="$ANDROID_HOME/emulator/emulator"
-          ADB="$ANDROID_HOME/platform-tools/adb"
-          AVDMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
-          test -x "$EMULATOR"
-          test -x "$ADB"
-          test -x "$AVDMANAGER"
-          echo no | "$AVDMANAGER" create avd --force -n turbo-charge-test -k 'system-images;android-35;default;x86_64'
-          "$EMULATOR" -avd turbo-charge-test -port 5554 -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim -accel off > /tmp/turbo-charge-emulator.log 2>&1 &
-          "$ADB" start-server
-          booted=0
-          for attempt in $(seq 1 180); do
-            if "$ADB" -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | grep -q '^1'; then
-              booted=1
-              break
-            fi
-            sleep 5
-          done
-          if [ "$booted" -ne 1 ]; then
-            echo "Emulator failed to boot within 15 minutes."
-            tail -200 /tmp/turbo-charge-emulator.log || true
-            exit 1
-          fi
-          echo "Android emulator boot completed."
-      - name: Install, launch and check APK
-        run: sh .github/scripts/android-smoke-test.sh
+          api-level: 35
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim
+          script: sh .github/scripts/android-smoke-test.sh
