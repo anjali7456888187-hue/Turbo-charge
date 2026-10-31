@@ -42,6 +42,7 @@ jobs:
   android-smoke-test:
     needs: android
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Download APK
         uses: actions/download-artifact@v4
