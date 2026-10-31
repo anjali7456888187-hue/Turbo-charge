@@ -18,3 +18,8 @@ The app uses the Turbo Charge Supabase project URL and publishable key in `src/s
 - Admin panel is intentionally out of scope for now.
 - This repository currently contains a responsive web app. A native Android APK still needs an Android wrapper/build and device testing.
 - Project-level email-confirmation settings may affect whether signup immediately creates an active session.
+
+
+### Public web deployment
+
+The app is deployed to GitHub Pages by `.github/workflows/deploy-pages.yml` after each push to `main`.
