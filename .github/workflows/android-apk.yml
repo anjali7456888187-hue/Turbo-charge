@@ -62,11 +62,18 @@ jobs:
         run: |
           set -eu
           echo no | avdmanager create avd --force -n turbo-charge-test -k 'system-images;android-35;default;x86_64'
-          emulator -avd turbo-charge-test -port 5554 -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -accel off > /tmp/turbo-charge-emulator.log 2>&1 &
-          adb start-server
+          EMULATOR="$ANDROID_HOME/emulator/emulator"
+          ADB="$ANDROID_HOME/platform-tools/adb"
+          AVDMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
+          test -x "$EMULATOR"
+          test -x "$ADB"
+          test -x "$AVDMANAGER"
+          echo no | "$AVDMANAGER" create avd --force -n turbo-charge-test -k 'system-images;android-35;default;x86_64'
+          "$EMULATOR" -avd turbo-charge-test -port 5554 -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim -accel off > /tmp/turbo-charge-emulator.log 2>&1 &
+          "$ADB" start-server
           booted=0
           for attempt in $(seq 1 180); do
-            if adb -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | grep -q '^1'; then
+            if "$ADB" -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | grep -q '^1'; then
               booted=1
               break
             fi
