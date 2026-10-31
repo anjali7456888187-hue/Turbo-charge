@@ -1,25 +1,48 @@
-## Turbo Charge
+# Turbo Charge
 
-Mobile-first account, announcements, notifications and support app.
+Mobile-first customer account, updates, alerts and support app.
 
-### Run locally
+## Customer features
+
+- Email + password sign up and login (no OTP UI).
+- Customer account is created first; the customer then logs in with the same email and password.
+- Home dashboard with latest published updates, unread alert count and support-ticket count.
+- Profile editing for username and optional mobile number.
+- Alerts with a mark-as-read action.
+- Support tickets, ticket history and customer replies.
+- Telegram support link and shareable sign-up link.
+- Profile, Alerts and Updates are available from Settings, not the main navigation.
+
+## Run locally
 
 1. Install Node.js 20 or newer.
 2. Run `npm install`.
 3. Run `npm run dev`.
-4. Run `npm run build` for a production build.
+4. Run `npm run build` for a production web build.
 
-The app uses the Turbo Charge Supabase project URL and publishable key in `src/supabase.js`. Never add a service-role key. Database access is protected by Supabase Auth and Row Level Security.
+## Android build and smoke test
 
-### Current status
+The `.github/workflows/android-apk.yml` workflow builds a debug APK, uploads it as `turbo-charge-debug-apk`, installs it on an Android emulator, launches the app, and checks that the app process remains running and no Android runtime crash is logged.
 
-- Login and signup screens are implemented with email/password authentication (no OTP UI).
-- Profile, announcements, notifications and support-ticket screens are connected to existing Supabase tables.
-- Admin panel is intentionally out of scope for now.
-- This repository currently contains a responsive web app. A native Android APK still needs an Android wrapper/build and device testing.
-- Project-level email-confirmation settings may affect whether signup immediately creates an active session.
+Open the repository's **Actions** tab to see build/test results and download the APK artifact from a successful run.
 
+## Backend
 
-### Public web deployment
+The app uses the Turbo Charge Supabase project URL and publishable key in `src/supabase.js`. Never add a service-role or secret key to the client. Public-schema tables have Row Level Security enabled; customer policies restrict profile, notification, ticket and message access to the signed-in owner.
+
+The database creates a customer profile when an Auth user is created and automatically adds a support acknowledgement when a ticket is opened. Project-level email-confirmation settings determine whether signup immediately returns a session.
+
+## Web deployment
 
 The app is deployed to GitHub Pages by `.github/workflows/deploy-pages.yml` after each push to `main`.
+
+## Manual customer acceptance checklist
+
+- Open the shared link and confirm it opens Sign Up.
+- Create an account, return to Login, and sign in with the same email/password.
+- Confirm Home loads and the Settings shortcuts open Profile, Alerts and Updates.
+- Save a profile change and confirm it remains after refresh/re-login.
+- Mark an alert as read and confirm the unread count changes.
+- Create a support ticket, open it, and send a reply.
+- Test Share App on Android and in a desktop browser.
+- Log out and confirm the next visitor sees the Login/Sign Up screen, not the previous account.
