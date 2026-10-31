@@ -35,11 +35,13 @@ jobs:
       - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug
+      - name: Rename APK for release download
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk "Turbo Charge.apk"
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: turbo-charge-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: Turbo Charge
+          path: Turbo Charge.apk
           if-no-files-found: error
 
   android-smoke-test:
@@ -52,7 +54,7 @@ jobs:
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
-          name: turbo-charge-debug-apk
+          name: Turbo Charge
           path: apk
       - name: Run APK on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
