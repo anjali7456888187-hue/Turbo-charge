@@ -61,7 +61,6 @@ jobs:
       - name: Create and boot Android emulator
         run: |
           set -eu
-          echo no | avdmanager create avd --force -n turbo-charge-test -k 'system-images;android-35;default;x86_64'
           EMULATOR="$ANDROID_HOME/emulator/emulator"
           ADB="$ANDROID_HOME/platform-tools/adb"
           AVDMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
