@@ -58,18 +58,4 @@ jobs:
           api-level: 35
           arch: x86_64
           disable-animations: true
-          script: |
-            set -eu
-            adb install apk/app-debug.apk
-            adb shell monkey -p com.turbocharge.app 1
-            sleep 12
-            if ! adb shell pidof com.turbocharge.app >/dev/null; then
-              echo "Turbo Charge process is not running after launch."
-              adb logcat -d -s AndroidRuntime:E | tail -n 120
-              exit 1
-            fi
-            if adb logcat -d -s AndroidRuntime:E | grep -E "FATAL EXCEPTION|Process: com.turbocharge.app"; then
-              echo "Android runtime crash detected."
-              exit 1
-            fi
-            echo "Turbo Charge installed and remained running in the Android emulator."
+          script: sh .github/scripts/android-smoke-test.sh
