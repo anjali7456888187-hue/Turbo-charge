@@ -13,7 +13,27 @@ adb install -r "$APK"
 
 echo "Launching Turbo Charge..."
 adb shell monkey -p "$PACKAGE" 1
-sleep 3
+
+echo "Checking visible app screen..."
+UI_OK=0
+ATTEMPT=1
+while [ "$ATTEMPT" -le 5 ]; do
+  sleep 2
+  adb shell uiautomator dump /sdcard/turbo-charge-ui.xml >/dev/null 2>&1 || true
+  if adb shell cat /sdcard/turbo-charge-ui.xml 2>/dev/null | grep -qi "Turbo Charge"; then
+    UI_OK=1
+    break
+  fi
+  ATTEMPT=$((ATTEMPT + 1))
+done
+
+if [ "$UI_OK" -ne 1 ]; then
+  echo "FAIL: Turbo Charge title was not found in the emulator UI."
+  adb shell dumpsys activity activities | tail -n 80
+  adb logcat -d -s AndroidRuntime:E chromium:E
+  exit 1
+fi
+echo "PASS: Turbo Charge title is visible on the emulator screen."
 
 if ! adb shell pidof "$PACKAGE" >/dev/null 2>&1; then
   echo "FAIL: app process did not start."
