@@ -12,15 +12,17 @@ echo "Installing APK..."
 adb install -r "$APK"
 
 echo "Launching Turbo Charge..."
-adb shell monkey -p "$PACKAGE" 1
+timeout 15 adb shell monkey -p "$PACKAGE" 1
 
 echo "Checking that Turbo Charge is the foreground activity..."
 FOREGROUND_OK=0
 ATTEMPT=1
 while [ "$ATTEMPT" -le 10 ]; do
   sleep 3
-  if adb shell dumpsys activity activities 2>/dev/null | grep -F "$PACKAGE" >/dev/null; then
-    if adb shell dumpsys window windows 2>/dev/null | grep -F "$PACKAGE" >/dev/null; then
+  ACTIVITY_DUMP="$(timeout 10 adb shell dumpsys activity activities 2>/dev/null || true)"
+  WINDOW_DUMP="$(timeout 10 adb shell dumpsys window windows 2>/dev/null || true)"
+  if printf '%s' "$ACTIVITY_DUMP" | grep -F "$PACKAGE" >/dev/null; then
+    if printf '%s' "$WINDOW_DUMP" | grep -F "$PACKAGE" >/dev/null; then
       FOREGROUND_OK=1
       break
     fi
