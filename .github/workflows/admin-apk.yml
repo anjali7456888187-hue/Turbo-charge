@@ -24,11 +24,11 @@ jobs:
         run: npm install
       - name: Build web app
         run: npm run build
-      - name: Create Android wrapper
-        run: npx cap add android
       - name: Configure Admin application identity
         run: |
           node --input-type=module -e "import fs from 'node:fs'; const p='capacitor.config.json'; const c=JSON.parse(fs.readFileSync(p,'utf8')); c.appId='com.turbocharge.admin'; c.appName='Turbo Charge Admin'; fs.writeFileSync(p,JSON.stringify(c,null,2));"
+      - name: Create Android wrapper
+        run: npx cap add android
       - name: Sync Android
         run: npx cap sync android
       - name: Build Admin APK
