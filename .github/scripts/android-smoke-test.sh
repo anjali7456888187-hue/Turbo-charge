@@ -9,18 +9,19 @@ adb wait-for-device
 adb logcat -c
 
 echo "Installing APK..."
-adb install -r "$APK"
+timeout 90 adb install -r "$APK"
 
 echo "Launching Turbo Charge..."
-timeout 15 adb shell monkey -p "$PACKAGE" 1
+# Cold emulator startup can make monkey slow; allow enough time for Android to dispatch the launch.
+timeout 60 adb shell monkey -p "$PACKAGE" 1
 
 echo "Checking that Turbo Charge is the foreground activity..."
 FOREGROUND_OK=0
 ATTEMPT=1
 while [ "$ATTEMPT" -le 10 ]; do
   sleep 3
-  ACTIVITY_DUMP="$(timeout 10 adb shell dumpsys activity activities 2>/dev/null || true)"
-  WINDOW_DUMP="$(timeout 10 adb shell dumpsys window windows 2>/dev/null || true)"
+  ACTIVITY_DUMP="$(timeout 15 adb shell dumpsys activity activities 2>/dev/null || true)"
+  WINDOW_DUMP="$(timeout 15 adb shell dumpsys window windows 2>/dev/null || true)"
   if printf '%s' "$ACTIVITY_DUMP" | grep -F "$PACKAGE" >/dev/null; then
     if printf '%s' "$WINDOW_DUMP" | grep -F "$PACKAGE" >/dev/null; then
       FOREGROUND_OK=1
@@ -32,7 +33,7 @@ done
 
 if [ "$FOREGROUND_OK" -ne 1 ]; then
   echo "FAIL: Turbo Charge did not become the foreground app."
-  adb shell dumpsys activity activities | tail -n 100
+  timeout 20 adb shell dumpsys activity activities | tail -n 100 || true
   adb logcat -d -s AndroidRuntime:E chromium:E
   exit 1
 fi
