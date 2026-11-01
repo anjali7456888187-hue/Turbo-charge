@@ -55,6 +55,20 @@ Deno.serve(async (req: Request) => {
     if (!body.request_id || !["approve", "reject"].includes(body.decision || "")) return reply({ error: "Request ID and valid decision are required" }, 400);
     const { data, error } = await db.rpc("tc_admin_review_premium_payment", { p_request_id: body.request_id, p_decision: body.decision, p_admin_id: admin.id });
     if (error) return reply({ error: error.message || "Review could not be completed" }, 400);
+    const { data: request } = await db.from("tc_premium_payment_requests")
+      .select("user_id,plan_days,amount").eq("id", body.request_id).maybeSingle();
+    if (request) {
+      const approved = body.decision === "approve";
+      const { error: notificationError } = await db.from("tc_notifications").insert({
+        user_id: request.user_id,
+        title: approved ? "Premium activated" : "Premium request rejected",
+        body: approved
+          ? `Your ${request.plan_days}-day Premium plan (₹${request.amount}) is now active. Tools are unlocked until the expiry date shown in your account.`
+          : "Your Premium payment request was rejected. Please contact support if you believe this was a mistake.",
+        kind: "account",
+      });
+      if (notificationError) console.error("Premium review notification failed", notificationError.message);
+    }
     await db.from("tc_audit_events").insert({ actor_id: admin.id, event_type: "premium_payment_" + body.decision, target_type: "premium_payment_request", target_id: body.request_id });
     return reply({ result: data });
   }
