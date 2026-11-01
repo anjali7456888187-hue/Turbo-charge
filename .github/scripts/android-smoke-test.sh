@@ -11,9 +11,14 @@ adb logcat -c
 echo "Installing APK..."
 timeout 90 adb install -r "$APK"
 
-echo "Launching Turbo Charge..."
-# Cold emulator startup can make monkey slow; allow enough time for Android to dispatch the launch.
-timeout 60 adb shell monkey -p "$PACKAGE" 1
+echo "Resolving the app launch activity..."
+LAUNCH_ACTIVITY="$(timeout 20 adb shell cmd package resolve-activity --brief "$PACKAGE" 2>/dev/null | tr -d '\\r' | tail -n 1)"
+if [ -z "$LAUNCH_ACTIVITY" ] || ! printf '%s' "$LAUNCH_ACTIVITY" | grep -F "$PACKAGE/" >/dev/null; then
+  LAUNCH_ACTIVITY="$PACKAGE/.MainActivity"
+fi
+
+echo "Launching Turbo Charge: $LAUNCH_ACTIVITY"
+timeout 30 adb shell am start -W -n "$LAUNCH_ACTIVITY"
 
 echo "Checking that Turbo Charge is the foreground activity..."
 FOREGROUND_OK=0
