@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 set -eu
 
-APK="apk/Turbo Charge.apk"
-PACKAGE="com.turbocharge.app"
+APK="${APK_PATH:-apk/Turbo Charge.apk}"
+PACKAGE="${PACKAGE_ID:-com.turbocharge.app}"
 
 test -s "$APK"
 adb wait-for-device
