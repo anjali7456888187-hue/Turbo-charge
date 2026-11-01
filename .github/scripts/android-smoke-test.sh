@@ -5,6 +5,7 @@ APK="${APK_PATH:-apk/Turbo Charge.apk}"
 PACKAGE="${PACKAGE_ID:-com.turbocharge.app}"
 
 test -s "$APK"
+echo "Smoke-testing package: $PACKAGE"
 adb wait-for-device
 adb logcat -c
 
