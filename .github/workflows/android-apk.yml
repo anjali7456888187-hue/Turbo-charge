@@ -2,6 +2,9 @@ name: Turbo Charge Android APK
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '.github/workflows/android-apk.yml'
+      - '.github/workflows/admin-apk.yml'
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
