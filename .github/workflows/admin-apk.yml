@@ -9,6 +9,7 @@ on:
       - 'package-lock.json'
       - 'capacitor.config.json'
       - 'supabase/**'
+      - '.github/scripts/android-smoke-test.sh'
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -62,7 +63,7 @@ jobs:
       - name: Install and launch Admin APK in emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: 30
           arch: x86_64
           profile: pixel_2
           disable-animations: true
