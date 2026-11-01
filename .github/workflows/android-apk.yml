@@ -62,7 +62,7 @@ jobs:
       - name: Run APK on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: 30
           arch: x86_64
           profile: pixel_2
           disable-animations: true
