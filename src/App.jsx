@@ -35,7 +35,8 @@ export default function App(){
  useEffect(()=>{const timer=setInterval(()=>setClockNow(Date.now()),1000);return()=>clearInterval(timer);},[]);
  useEffect(()=>{if(!session?.user?.id){setToolNotes([]);setNotesOwnerId('');return;}const owner=session.user.id;let saved=[];try{saved=JSON.parse(localStorage.getItem('tc-tool-notes:'+owner)||'[]');}catch{}setToolNotes(Array.isArray(saved)?saved:[]);setNotesOwnerId(owner);},[session?.user?.id]);
  useEffect(()=>{if(!notesOwnerId||notesOwnerId!==session?.user?.id)return;try{localStorage.setItem('tc-tool-notes:'+notesOwnerId,JSON.stringify(toolNotes));}catch{}},[toolNotes,notesOwnerId,session?.user?.id]);
- useEffect(()=>{if(!timerRunning)return;const timer=window.setInterval(()=>setTimerRemaining(value=>{if(value<=1){setTimerRunning(false);return 0;}return value-1;}),1000);return()=>window.clearInterval(timer);},[timerRunning]);
+ useEffect(()=>{if(!timerRunning)return;const timer=window.setInterval(()=>setTimerRemaining(value=>Math.max(0,value-1)),1000);return()=>window.clearInterval(timer);},[timerRunning]);
+ useEffect(()=>{if(timerRunning&&timerRemaining===0)setTimerRunning(false);},[timerRunning,timerRemaining]);
  useEffect(()=>{if(session)loadData();},[session]);
  useEffect(()=>{if(!session)return;const refreshPremium=()=>{if(document.visibilityState==='visible')loadData();};window.addEventListener('focus',refreshPremium);document.addEventListener('visibilitychange',refreshPremium);const refreshTimer=setInterval(refreshPremium,30000);return()=>{window.removeEventListener('focus',refreshPremium);document.removeEventListener('visibilitychange',refreshPremium);clearInterval(refreshTimer);};},[session]);
  useEffect(()=>{if(import.meta.env.VITE_ADMIN_APP==='true'&&page==='admin'&&session?.user?.app_metadata?.role==='admin')loadAdminPanel();},[page,session]);
