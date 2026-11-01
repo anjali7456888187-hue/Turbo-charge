@@ -1,0 +1,63 @@
+name: Turbo Charge Admin APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  admin-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install dependencies
+        run: npm install
+      - name: Build web app
+        run: npm run build
+      - name: Create Android wrapper
+        run: npx cap add android
+      - name: Configure Admin application identity
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; const p='capacitor.config.json'; const c=JSON.parse(fs.readFileSync(p,'utf8')); c.appId='com.turbocharge.admin'; c.appName='Turbo Charge Admin'; fs.writeFileSync(p,JSON.stringify(c,null,2));"
+      - name: Sync Android
+        run: npx cap sync android
+      - name: Build Admin APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Package Admin APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk "Turbo Charge Admin.apk"
+      - name: Upload Admin APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Turbo Charge Admin
+          path: Turbo Charge Admin.apk
+          if-no-files-found: error
+  admin-emulator-test:
+    needs: admin-android
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Turbo Charge Admin
+          path: apk
+      - name: Install and launch Admin APK in emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim
+          script: APK_PATH="apk/Turbo Charge Admin.apk" PACKAGE_ID="com.turbocharge.admin" sh .github/scripts/android-smoke-test.sh
