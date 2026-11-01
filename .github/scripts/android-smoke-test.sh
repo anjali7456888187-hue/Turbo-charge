@@ -6,7 +6,23 @@ PACKAGE="${PACKAGE_ID:-com.turbocharge.app}"
 
 test -s "$APK"
 echo "Smoke-testing package: $PACKAGE"
-adb wait-for-device
+echo "Waiting for Android emulator (maximum 180 seconds)..."
+timeout 180 adb wait-for-device
+BOOT_ATTEMPT=1
+while [ "$BOOT_ATTEMPT" -le 60 ]; do
+  BOOT_STATE="$(timeout 10 adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\\r' || true)"
+  if [ "$BOOT_STATE" = "1" ]; then
+    break
+  fi
+  sleep 2
+  BOOT_ATTEMPT=$((BOOT_ATTEMPT + 1))
+done
+if [ "$BOOT_STATE" != "1" ]; then
+  echo "FAIL: Android emulator did not finish booting within 120 seconds."
+  adb devices -l || true
+  exit 1
+fi
+echo "PASS: Android emulator boot completed."
 adb logcat -c
 
 echo "Installing APK..."
