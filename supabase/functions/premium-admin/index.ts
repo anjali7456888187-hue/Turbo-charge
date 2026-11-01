@@ -22,6 +22,9 @@ Deno.serve(async (req: Request) => {
   const admin = auth?.user;
   if (authError || !admin) return reply({ error: "Invalid session" }, 401);
   if (admin.app_metadata?.role !== "admin") return reply({ error: "Admin access required" }, 403);
+  const { data: adminMembership, error: membershipError } = await db.from("tc_admins")
+    .select("user_id").eq("user_id", admin.id).maybeSingle();
+  if (membershipError || !adminMembership) return reply({ error: "Admin account is not authorized" }, 403);
 
   let body: { action?: string; request_id?: string; decision?: string; ticket_id?: string; message?: string; status?: string; title?: string; text?: string; user_id?: string; kind?: string; is_published?: boolean };
   try { body = await req.json(); } catch { return reply({ error: "Invalid JSON body" }, 400); }
