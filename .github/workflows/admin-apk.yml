@@ -2,6 +2,13 @@ name: Turbo Charge Admin APK
 on:
   push:
     branches: [main]
+    paths:
+      - '.github/workflows/admin-apk.yml'
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.json'
+      - 'supabase/**'
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
