@@ -40,15 +40,13 @@ timeout 30 adb shell am start -W -n "$LAUNCH_ACTIVITY"
 echo "Checking that Turbo Charge is the foreground activity..."
 FOREGROUND_OK=0
 ATTEMPT=1
-while [ "$ATTEMPT" -le 10 ]; do
-  sleep 3
-  ACTIVITY_DUMP="$(timeout 15 adb shell dumpsys activity activities 2>/dev/null || true)"
-  WINDOW_DUMP="$(timeout 15 adb shell dumpsys window windows 2>/dev/null || true)"
-  if printf '%s' "$ACTIVITY_DUMP" | grep -F "$PACKAGE" >/dev/null; then
-    if printf '%s' "$WINDOW_DUMP" | grep -F "$PACKAGE" >/dev/null; then
-      FOREGROUND_OK=1
-      break
-    fi
+while [ "$ATTEMPT" -le 12 ]; do
+  sleep 2
+  FOCUS_DUMP="$(timeout 8 adb shell dumpsys window 2>/dev/null | grep -E "mCurrentFocus|mFocusedApp" || true)"
+  ACTIVITY_DUMP="$(timeout 8 adb shell dumpsys activity activities 2>/dev/null | grep -E "topResumedActivity|mResumedActivity|Resumed:" || true)"
+  if printf '%s\n%s' "$FOCUS_DUMP" "$ACTIVITY_DUMP" | grep -F "$PACKAGE" >/dev/null; then
+    FOREGROUND_OK=1
+    break
   fi
   ATTEMPT=$((ATTEMPT + 1))
 done
