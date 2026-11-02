@@ -46,3 +46,12 @@ The app is deployed to GitHub Pages by `.github/workflows/deploy-pages.yml` afte
 - Create a support ticket, open it, and send a reply.
 - Test Share App on Android and in a desktop browser.
 - Log out and confirm the next visitor sees the Login/Sign Up screen, not the previous account.
+
+## AR S1 live server connection
+
+- The AR S1 entry is available from the Tools screen in both Member and Admin builds.
+- Member view reads `/api/status` and listens to `/ws` over HTTPS/WSS.
+- Admin view can publish a status/message with a runtime-entered server token.
+- Server source is in `server/`; Render Blueprint is `render.yaml`.
+- Run backend tests from the repository root with `python -m pytest server/tests -q`.
+- Set up the Render service from the Blueprint and configure `DASHBOARD_API_TOKEN` before connecting the apps. Do not put the admin token in Member builds.
