@@ -50,16 +50,6 @@ jobs:
           name: Turbo Charge Admin
           path: Turbo Charge Admin.apk
           if-no-files-found: error
-  admin-emulator-test:
-    needs: admin-android
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: Turbo Charge Admin
-          path: apk
       - name: Install and launch Admin APK in emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -68,4 +58,4 @@ jobs:
           profile: pixel_2
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim
-          script: APK_PATH="apk/Turbo Charge Admin.apk" PACKAGE_ID="com.turbocharge.admin" sh .github/scripts/android-smoke-test.sh
+          script: APK_PATH="Turbo Charge Admin.apk" PACKAGE_ID="com.turbocharge.admin" sh .github/scripts/android-smoke-test.sh
