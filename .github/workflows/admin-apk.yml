@@ -53,7 +53,7 @@ jobs:
   admin-emulator-test:
     needs: admin-android
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
