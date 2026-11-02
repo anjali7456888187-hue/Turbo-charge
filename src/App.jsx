@@ -28,7 +28,7 @@ function friendlyDbError(error,fallback='Request poori nahi ho saki. Internet ch
 
 export default function App(){
  const [session,setSession]=useState(null),[loading,setLoading]=useState(true),[mode,setMode]=useState(()=>import.meta.env.VITE_ADMIN_APP==='true'?'login':new URLSearchParams(window.location.search).get('signup')==='1'?'signup':'choose'),[page,setPage]=useState('home'),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
- const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[confirm,setConfirm]=useState(''),[username,setUsername]=useState('');
+ const [email,setEmail]=useState(()=>import.meta.env.VITE_ADMIN_APP==='true'?'shubham.katara91@gmail.com':''),[password,setPassword]=useState(''),[confirm,setConfirm]=useState(''),[username,setUsername]=useState('');
  const [boostOpen,setBoostOpen]=useState(false),[utr,setUtr]=useState(''),[utrStatus,setUtrStatus]=useState(''),[selectedPlan,setSelectedPlan]=useState(null),[selectedPayApp,setSelectedPayApp]=useState(''),[paymentQr,setPaymentQr]=useState(''),[premiumSub,setPremiumSub]=useState(null),[paymentRequests,setPaymentRequests]=useState([]),[clockNow,setClockNow]=useState(Date.now());
  const [activeTool,setActiveTool]=useState(''),[qrText,setQrText]=useState(''),[qrData,setQrData]=useState(''),[timerMinutes,setTimerMinutes]=useState('5'),[timerRemaining,setTimerRemaining]=useState(300),[timerRunning,setTimerRunning]=useState(false),[noteDraft,setNoteDraft]=useState(''),[toolNotes,setToolNotes]=useState([]),[notesOwnerId,setNotesOwnerId]=useState('');
  const hasActivePremium=Boolean(premiumSub&&premiumSub.status==='active'&&new Date(premiumSub.expires_at).getTime()>Date.now());
