@@ -23,7 +23,7 @@ if [ "$BOOT_STATE" != "1" ]; then
   exit 1
 fi
 echo "PASS: Android emulator boot completed."
-adb logcat -c
+adb logcat -b main -b system -b crash -c 2>/dev/null || true
 
 echo "Installing APK..."
 timeout 90 adb install -r "$APK"
