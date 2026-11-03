@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-APK="${APK_PATH:-apk/Turbo Charge.apk}"
+APK="${APK_PATH:-apk/TurboCharge.apk}"
 PACKAGE="${PACKAGE_ID:-com.turbocharge.app}"
 
 test -s "$APK"
