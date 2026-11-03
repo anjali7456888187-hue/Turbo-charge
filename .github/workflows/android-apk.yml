@@ -10,7 +10,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 permissions:
-  contents: read
+  contents: write
   actions: read
 jobs:
   android:
@@ -38,13 +38,13 @@ jobs:
       - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug
-      - name: Rename APK for release download
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk "Turbo Charge.apk"
-      - name: Upload APK
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk TurboCharge.apk
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: Turbo Charge
-          path: Turbo Charge.apk
+          path: TurboCharge.apk
           if-no-files-found: error
 
   android-smoke-test:
@@ -68,3 +68,20 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-audio -no-boot-anim
           script: sh .github/scripts/android-smoke-test.sh
+
+  publish-release:
+    needs: android-smoke-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: Turbo Charge
+      - name: Publish latest APK release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-build-${{ github.run_number }}
+          name: Turbo Charge Android build ${{ github.run_number }}
+          body: "Turbo Charge Android APK. Install the update after downloading."
+          files: TurboCharge.apk
+          make_latest: true
